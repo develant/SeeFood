@@ -20,9 +20,12 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         super.viewDidLoad()
         
         imagePicker.delegate = self
-        imagePicker.sourceType = .photoLibrary // .photoLibrary For accessing photo library instead of camera
         imagePicker.allowsEditing = false
         
+        let greenColour = UIColor(red: 197/255.0, green: 249/255.0, blue: 217/255.0, alpha: 1.0)
+        navigationController?.navigationBar.tintColor = greenColour
+        imageView.backgroundColor = greenColour
+        navigationController?.navigationBar.barTintColor = UIColor(red: 8/255.0, green: 224/255.0, blue: 128/255.0, alpha: 1.0)
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
@@ -54,7 +57,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
                 fatalError("Model failed to process image")
             }
             
-            print(results)
+            if let firstResult = results.first {
+                self.navigationItem.title = firstResult.identifier
+            }
             
         }
         
@@ -70,7 +75,28 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     
     @IBAction func cameraTapped(_ sender: UIBarButtonItem) {
         
-        present(imagePicker, animated: true, completion: nil)
+        let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let cameraAction = UIAlertAction(title: "Take a new photo", style: .default) { (action) in
+            
+            self.imagePicker.sourceType = .camera
+            self.present(self.imagePicker, animated: true, completion: nil)
+        }
+        
+        let photoAction = UIAlertAction(title: "Choose from photo library", style: .default) { (action) in
+            
+            self.imagePicker.sourceType = .photoLibrary
+            self.present(self.imagePicker, animated: true, completion: nil)
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        
+        alert.addAction(cameraAction)
+        alert.addAction(photoAction)
+        alert.addAction(cancelAction)
+        
+        //present(imagePicker, animated: true, completion: nil)
+        present(alert, animated: true, completion: nil)
     }
     
 }
