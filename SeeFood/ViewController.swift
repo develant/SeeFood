@@ -15,6 +15,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     @IBOutlet weak var imageView: UIImageView!
     
     let imagePicker = UIImagePickerController()
+    let foodArray = Food().foodArray
+    
+    let colours = Colours()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,10 +25,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         imagePicker.delegate = self
         imagePicker.allowsEditing = false
         
-        let greenColour = UIColor(red: 197/255.0, green: 249/255.0, blue: 217/255.0, alpha: 1.0)
-        navigationController?.navigationBar.tintColor = greenColour
-        imageView.backgroundColor = greenColour
-        navigationController?.navigationBar.barTintColor = UIColor(red: 8/255.0, green: 224/255.0, blue: 128/255.0, alpha: 1.0)
+      setColours(with: colours.lightPurpleColour, and: colours.darkPurpleColour)
+        
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
@@ -39,7 +40,6 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             
             detect(image: ciimage)
         }
-        
         
         imagePicker.dismiss(animated: true, completion: nil)
         
@@ -58,9 +58,23 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             }
             
             if let firstResult = results.first {
-                self.navigationItem.title = firstResult.identifier
+                
+                var isFood: Bool = false
+                
+                for food in self.foodArray {
+                    
+                    if firstResult.identifier.contains(food) {
+                        isFood = true
+                        self.setColours(with: self.colours.lightGreenColour, and: self.colours.darkGreenColour)
+                        break
+                    } else {
+                        isFood = false
+                        self.setColours(with: self.colours.lightRedColour, and: self.colours.darkRedColour)
+                    }
+                }
+                
+                self.navigationItem.title = isFood ? "Eatable" : "Uneatable"
             }
-            
         }
         
         let handler = VNImageRequestHandler(ciImage: image)
@@ -70,7 +84,6 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         } catch {
             print("error")
         }
-        
     }
     
     @IBAction func cameraTapped(_ sender: UIBarButtonItem) {
@@ -95,8 +108,14 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         alert.addAction(photoAction)
         alert.addAction(cancelAction)
         
-        //present(imagePicker, animated: true, completion: nil)
         present(alert, animated: true, completion: nil)
     }
     
+    func setColours(with lightColour: UIColor, and darkColour: UIColor) {
+    
+        navigationController?.navigationBar.tintColor = lightColour
+        imageView.backgroundColor = lightColour
+        navigationController?.navigationBar.barTintColor = darkColour
+    
+    }
 }
